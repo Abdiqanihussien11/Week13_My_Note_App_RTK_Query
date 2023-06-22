@@ -13,7 +13,8 @@ function App() {
           <Routes>
           {window.location.pathname === "/" && (
             <Route path="/" element={<AddNote />} />
-          ) } else {
+          ) } 
+          else {
             <Route path="/edit/:id" element={<EditNote />} />
           }
           </Routes>

@@ -2,26 +2,19 @@
 
 import React, { useEffect } from "react";
 import { FaEdit, FaTrash } from "react-icons/fa";
-import { useSelector, useDispatch } from "react-redux";
-import { deleteNote, fetchNotes } from "../store/api/NoteSlice";
+import { useFetchNotesQuery, useDeleteNoteMutation } from "../store/api/NoteSlice";
 import { Link } from "react-router-dom";
 
 function Notes() {
-  const allNotes = useSelector((state) => state.notes);
 
-  const { notes, status, error } = allNotes;
+  const {data : notes = []} = useFetchNotesQuery()
+  const [deleteNote] = useDeleteNoteMutation()
 
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    dispatch(fetchNotes());
-  }, [dispatch]);
-
+  // console.log("data",notes);
   const deleteNoteHandler = (id) => {
-    dispatch(deleteNote(id));
+    deleteNote({id});
   };
   
-
   return (
     <div className="flex flex-wrap justify-center mt-5">
       {status === "loading" && <div className="relative p-5 bg-yellow-400 w-64 h-64 m-5 shadow-2xl overflow-hidden">Loading...</div>}

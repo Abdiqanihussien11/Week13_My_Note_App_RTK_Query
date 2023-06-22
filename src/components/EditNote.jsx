@@ -1,39 +1,31 @@
 import React, { useEffect, useState } from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
-import { useSelector, useDispatch } from "react-redux";
-import { editNote, fetchNotes } from "../store/api/NoteSlice";
+import { useUpdateNoteMutation, useFetchNotesQuery } from "../store/api/NoteSlice";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 
 const EditNote = () => {
-
-  const dispatch = useDispatch();
   const params = useParams();
   const navigate = useNavigate();
+
+  const [editNote] = useUpdateNoteMutation();
+  const {data: notes = []} = useFetchNotesQuery();
 
   const [initialValues, setInitialValues] = useState({
     title: '',
     content: '',
   });
 
-  const allNotes = useSelector((state) => state.notes.notes);
-
   useEffect(() => {
-    dispatch(fetchNotes());
-  }, [dispatch]);
-  
-  useEffect(() => {
-    const note = allNotes.find((note) => note.id === Number(params.id));
+    const note = notes.find((note) => note.id === Number(params.id));
     if (note) {
       setInitialValues({
         title: note.title,
         content: note.content,
       });
     }
-  }, [allNotes, params.id]);
-
-
+  }, [notes, params.id]);
 
   const validationSchema = Yup.object({
     title: Yup.string().required('Title is required'),
@@ -41,13 +33,12 @@ const EditNote = () => {
   });
 
   const handleSubmit = (values) => {
- 
-    dispatch(editNote({
-      noteId: Number(params.id),
-      updateNote: values,
-    })).then(() => {
+    editNote({
+      id: Number(params.id),
+      updatedNote : values
+    }).unwrap().then(() => {
       navigate('/');
-    });
+    })
   };
 
   return (
